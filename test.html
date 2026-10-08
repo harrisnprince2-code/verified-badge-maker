@@ -3,147 +3,819 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Character Test Lab</title>
+
+  <title>Character Inspector</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 25px;
-      background: #080808;
+      background: #07090d;
       color: white;
       font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
     }
 
     h1 {
       margin-bottom: 8px;
     }
 
-    p {
-      color: #aaa;
+    .subtitle {
+      color: #9aa3af;
+      line-height: 1.5;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 10px;
+    .card {
       margin-top: 25px;
+      padding: 25px;
+      background: #11151c;
+      border: 1px solid #29313d;
+      border-radius: 16px;
     }
 
-    .item {
-      background: #151515;
-      border: 1px solid #292929;
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-    }
-
-    .char {
+    label {
       display: block;
-      font-size: 32px;
-      height: 45px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+      font-weight: bold;
     }
 
-    .code {
-      display: block;
-      color: #888;
-      font-size: 11px;
-      margin-bottom: 8px;
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+
+      padding: 18px;
+
+      background: #080a0e;
+      color: white;
+
+      border: 1px solid #343c48;
+      border-radius: 12px;
+
+      outline: none;
+
+      font-size: 22px;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      border-color: #249cff;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
     }
 
     button {
       border: 0;
-      border-radius: 7px;
-      padding: 7px 10px;
+      border-radius: 9px;
+
+      padding: 11px 16px;
+
       background: #1877f2;
       color: white;
+
+      font-size: 14px;
+      font-weight: bold;
+
       cursor: pointer;
     }
 
     button:hover {
       background: #0d65d9;
     }
+
+    button.secondary {
+      background: #252b34;
+    }
+
+    button.secondary:hover {
+      background: #303844;
+    }
+
+    .result {
+      margin-top: 22px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result-box {
+      background: #080a0e;
+      border: 1px solid #29313d;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 10px;
+    }
+
+    .character {
+      font-size: 55px;
+      min-height: 70px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-bottom: 1px solid #252b34;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+
+      padding: 10px 0;
+
+      border-bottom: 1px solid #1d232c;
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .key {
+      color: #9aa3af;
+    }
+
+    .value {
+      font-family: Consolas, monospace;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .warning {
+      margin-top: 18px;
+      padding: 14px;
+
+      background: #19150c;
+      border: 1px solid #4a3b19;
+      border-radius: 10px;
+
+      color: #d8c48a;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .success {
+      margin-top: 18px;
+      padding: 14px;
+
+      background: #0c1912;
+      border: 1px solid #1e5735;
+      border-radius: 10px;
+
+      color: #7ee2a5;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    .history {
+      margin-top: 30px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      padding: 12px;
+
+      background: #0b0e13;
+      border: 1px solid #252c35;
+      border-radius: 10px;
+
+      margin-top: 8px;
+    }
+
+    .history-character {
+      width: 45px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .history-code {
+      font-family: Consolas, monospace;
+      color: #aeb7c4;
+    }
+
+    .empty {
+      color: #737d8a;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+
+      body {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .row {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .value {
+        text-align: left;
+      }
+
+    }
   </style>
 </head>
 
 <body>
 
-  <h1>Character Test Lab</h1>
+  <div class="container">
 
-  <p>
-    Test private-use characters. Some may appear as boxes if your
-    device/browser does not have the corresponding glyph.
-  </p>
+    <h1>Character Inspector</h1>
 
-  <div class="grid" id="grid"></div>
+    <p class="subtitle">
+      Paste the mystery character here. This tool will inspect the
+      actual Unicode character instead of trying to identify it from
+      a screenshot.
+    </p>
+
+
+    <!-- =========================================
+         INSPECTOR
+    ========================================== -->
+
+    <div class="card">
+
+      <label for="characterInput">
+        Paste the mystery character
+      </label>
+
+      <textarea
+        id="characterInput"
+        placeholder="Paste the character here..."
+        autocomplete="off"
+        spellcheck="false"
+      ></textarea>
+
+
+      <div class="buttons">
+
+        <button id="inspectButton">
+          Inspect Character
+        </button>
+
+        <button
+          id="pasteButton"
+          class="secondary"
+        >
+          Paste From Clipboard
+        </button>
+
+        <button
+          id="clearButton"
+          class="secondary"
+        >
+          Clear
+        </button>
+
+      </div>
+
+
+      <!-- =========================================
+           RESULT
+      ========================================== -->
+
+      <div
+        id="result"
+        class="result"
+      >
+
+        <div class="result-box">
+
+          <div
+            id="characterPreview"
+            class="character"
+          ></div>
+
+
+          <div class="info">
+
+            <div class="row">
+              <span class="key">
+                Character
+              </span>
+
+              <span
+                id="characterValue"
+                class="value"
+              ></span>
+            </div>
+
+
+            <div class="row">
+              <span class="key">
+                Unicode Code Point
+              </span>
+
+              <span
+                id="unicodeValue"
+                class="value"
+              ></span>
+            </div>
+
+
+            <div class="row">
+              <span class="key">
+                Decimal
+              </span>
+
+              <span
+                id="decimalValue"
+                class="value"
+              ></span>
+            </div>
+
+
+            <div class="row">
+              <span class="key">
+                UTF-16
+              </span>
+
+              <span
+                id="utf16Value"
+                class="value"
+              ></span>
+            </div>
+
+
+            <div class="row">
+              <span class="key">
+                Code Point Type
+              </span>
+
+              <span
+                id="typeValue"
+                class="value"
+              ></span>
+            </div>
+
+          </div>
+
+
+          <div
+            id="message"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================================
+         TEST HISTORY
+    ========================================== -->
+
+    <div class="card history">
+
+      <h2>Test History</h2>
+
+      <p class="subtitle">
+        Characters you inspect will appear here.
+      </p>
+
+      <div id="historyList">
+
+        <div class="empty">
+          No characters tested yet.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 
   <script>
 
-    const grid = document.getElementById("grid");
+    const input =
+      document.getElementById("characterInput");
 
-    /*
-      Unicode Private Use Area:
-      U+E000 through U+F8FF
-    */
+    const inspectButton =
+      document.getElementById("inspectButton");
 
-    const start = 0xE000;
-    const end = 0xE0FF;
+    const pasteButton =
+      document.getElementById("pasteButton");
 
-    for (let code = start; code <= end; code++) {
+    const clearButton =
+      document.getElementById("clearButton");
 
+    const result =
+      document.getElementById("result");
+
+    const characterPreview =
+      document.getElementById("characterPreview");
+
+    const characterValue =
+      document.getElementById("characterValue");
+
+    const unicodeValue =
+      document.getElementById("unicodeValue");
+
+    const decimalValue =
+      document.getElementById("decimalValue");
+
+    const utf16Value =
+      document.getElementById("utf16Value");
+
+    const typeValue =
+      document.getElementById("typeValue");
+
+    const message =
+      document.getElementById("message");
+
+    const historyList =
+      document.getElementById("historyList");
+
+
+    // =========================================
+    // GET CHARACTER TYPE
+    // =========================================
+
+    function getCharacterType(codePoint) {
+
+      if (
+        codePoint >= 0xE000 &&
+        codePoint <= 0xF8FF
+      ) {
+        return "Private Use Area";
+      }
+
+      if (
+        codePoint >= 0xF0000 &&
+        codePoint <= 0xFFFFD
+      ) {
+        return "Supplementary Private Use Area-A";
+      }
+
+      if (
+        codePoint >= 0x100000 &&
+        codePoint <= 0x10FFFD
+      ) {
+        return "Supplementary Private Use Area-B";
+      }
+
+      if (
+        codePoint >= 0xD800 &&
+        codePoint <= 0xDFFF
+      ) {
+        return "UTF-16 surrogate";
+      }
+
+      return "Standard Unicode character";
+    }
+
+
+    // =========================================
+    // FORMAT UNICODE
+    // =========================================
+
+    function formatUnicode(codePoint) {
+
+      return "U+" +
+        codePoint
+          .toString(16)
+          .toUpperCase()
+          .padStart(4, "0");
+
+    }
+
+
+    // =========================================
+    // GET UTF-16
+    // =========================================
+
+    function getUTF16(character) {
+
+      const units = [];
+
+      for (
+        let i = 0;
+        i < character.length;
+        i++
+      ) {
+
+        units.push(
+          character
+            .charCodeAt(i)
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, "0")
+        );
+
+      }
+
+      return units.join(" ");
+    }
+
+
+    // =========================================
+    // INSPECT
+    // =========================================
+
+    function inspectCharacter() {
+
+      const text =
+        input.value;
+
+      if (!text) {
+
+        result.classList.remove("show");
+
+        return;
+
+      }
+
+
+      // Get first Unicode code point
       const character =
-        String.fromCodePoint(code);
+        Array.from(text)[0];
+
+      const codePoint =
+        character.codePointAt(0);
+
+
+      // Display character
+      characterPreview.textContent =
+        character;
+
+
+      characterValue.textContent =
+        character;
+
+
+      unicodeValue.textContent =
+        formatUnicode(codePoint);
+
+
+      decimalValue.textContent =
+        codePoint.toString();
+
+
+      utf16Value.textContent =
+        getUTF16(character);
+
+
+      typeValue.textContent =
+        getCharacterType(codePoint);
+
+
+      // =========================================
+      // MESSAGE
+      // =========================================
+
+      if (
+        codePoint >= 0xE000 &&
+        codePoint <= 0xF8FF
+      ) {
+
+        message.className =
+          "warning";
+
+        message.textContent =
+          "This is a Private Use Area character. " +
+          "That is interesting because its appearance " +
+          "can be defined by a specific app or font. " +
+          "The code point alone does not guarantee that " +
+          "another app will render the same symbol.";
+
+      } else {
+
+        message.className =
+          "success";
+
+        message.textContent =
+          "This appears to be a standard Unicode character. " +
+          "We can now identify exactly what character it is.";
+
+      }
+
+
+      result.classList.add("show");
+
+
+      // =========================================
+      // HISTORY
+      // =========================================
+
+      addHistory(
+        character,
+        codePoint
+      );
+
+    }
+
+
+    // =========================================
+    // ADD HISTORY
+    // =========================================
+
+    function addHistory(
+      character,
+      codePoint
+    ) {
+
+      const empty =
+        historyList.querySelector(".empty");
+
+      if (empty) {
+        empty.remove();
+      }
+
 
       const item =
         document.createElement("div");
 
-      item.className = "item";
+      item.className =
+        "history-item";
+
 
       const char =
-        document.createElement("span");
+        document.createElement("div");
 
-      char.className = "char";
-      char.textContent = character;
+      char.className =
+        "history-character";
 
-      const codeLabel =
-        document.createElement("span");
+      char.textContent =
+        character;
 
-      codeLabel.className = "code";
 
-      codeLabel.textContent =
-        "U+" + code.toString(16).toUpperCase().padStart(4, "0");
+      const code =
+        document.createElement("div");
 
-      const button =
+      code.className =
+        "history-code";
+
+      code.textContent =
+        formatUnicode(codePoint);
+
+
+      const copy =
         document.createElement("button");
 
-      button.textContent = "Copy";
+      copy.textContent =
+        "Copy";
 
-      button.addEventListener("click", async () => {
+      copy.addEventListener(
+        "click",
+        async () => {
+
+          try {
+
+            await navigator.clipboard.writeText(
+              character
+            );
+
+            copy.textContent =
+              "Copied ✓";
+
+            setTimeout(() => {
+
+              copy.textContent =
+                "Copy";
+
+            }, 1200);
+
+          } catch {
+
+            copy.textContent =
+              "Failed";
+
+          }
+
+        }
+      );
+
+
+      item.appendChild(char);
+      item.appendChild(code);
+      item.appendChild(copy);
+
+      historyList.prepend(item);
+
+    }
+
+
+    // =========================================
+    // INSPECT BUTTON
+    // =========================================
+
+    inspectButton.addEventListener(
+      "click",
+      inspectCharacter
+    );
+
+
+    // =========================================
+    // PASTE FROM CLIPBOARD
+    // =========================================
+
+    pasteButton.addEventListener(
+      "click",
+      async () => {
 
         try {
 
-          await navigator.clipboard.writeText(character);
+          const text =
+            await navigator.clipboard.readText();
 
-          button.textContent = "Copied ✓";
+          if (!text) {
 
-          setTimeout(() => {
-            button.textContent = "Copy";
-          }, 1200);
+            input.value = "";
 
-        } catch {
+            alert(
+              "Your clipboard appears to be empty."
+            );
 
-          button.textContent = "Failed";
+            return;
+
+          }
+
+          input.value =
+            text;
+
+          inspectCharacter();
+
+        } catch (error) {
+
+          alert(
+            "The browser did not allow clipboard access. " +
+            "Click inside the box and press Ctrl + V instead."
+          );
 
         }
 
-      });
+      }
+    );
 
-      item.appendChild(char);
-      item.appendChild(codeLabel);
-      item.appendChild(button);
 
-      grid.appendChild(item);
-    }
+    // =========================================
+    // CLEAR
+    // =========================================
+
+    clearButton.addEventListener(
+      "click",
+      () => {
+
+        input.value = "";
+
+        result.classList.remove(
+          "show"
+        );
+
+      }
+    );
+
+
+    // =========================================
+    // CTRL + ENTER
+    // =========================================
+
+    input.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.ctrlKey &&
+          event.key === "Enter"
+        ) {
+
+          inspectCharacter();
+
+        }
+
+      }
+    );
 
   </script>
 
