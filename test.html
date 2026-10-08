@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Test Lab</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 25px;
+      background: #080808;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #aaa;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    .item {
+      background: #151515;
+      border: 1px solid #292929;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .char {
+      display: block;
+      font-size: 32px;
+      height: 45px;
+      margin-bottom: 8px;
+    }
+
+    .code {
+      display: block;
+      color: #888;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      padding: 7px 10px;
+      background: #1877f2;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0d65d9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Character Test Lab</h1>
+
+  <p>
+    Test private-use characters. Some may appear as boxes if your
+    device/browser does not have the corresponding glyph.
+  </p>
+
+  <div class="grid" id="grid"></div>
+
+  <script>
+
+    const grid = document.getElementById("grid");
+
+    /*
+      Unicode Private Use Area:
+      U+E000 through U+F8FF
+    */
+
+    const start = 0xE000;
+    const end = 0xE0FF;
+
+    for (let code = start; code <= end; code++) {
+
+      const character =
+        String.fromCodePoint(code);
+
+      const item =
+        document.createElement("div");
+
+      item.className = "item";
+
+      const char =
+        document.createElement("span");
+
+      char.className = "char";
+      char.textContent = character;
+
+      const codeLabel =
+        document.createElement("span");
+
+      codeLabel.className = "code";
+
+      codeLabel.textContent =
+        "U+" + code.toString(16).toUpperCase().padStart(4, "0");
+
+      const button =
+        document.createElement("button");
+
+      button.textContent = "Copy";
+
+      button.addEventListener("click", async () => {
+
+        try {
+
+          await navigator.clipboard.writeText(character);
+
+          button.textContent = "Copied ✓";
+
+          setTimeout(() => {
+            button.textContent = "Copy";
+          }, 1200);
+
+        } catch {
+
+          button.textContent = "Failed";
+
+        }
+
+      });
+
+      item.appendChild(char);
+      item.appendChild(codeLabel);
+      item.appendChild(button);
+
+      grid.appendChild(item);
+    }
+
+  </script>
+
+</body>
+</html>
