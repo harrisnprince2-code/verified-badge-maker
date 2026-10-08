@@ -12,49 +12,46 @@ const badgeButton = document.getElementById("badgeButton");
 const status = document.getElementById("status");
 
 
-// -----------------------------
+// ========================================
 // UPDATE NAME
-// -----------------------------
+// ========================================
 
 nameInput.addEventListener("input", () => {
   previewName.textContent = nameInput.value || "Harrison";
 });
 
 
-// -----------------------------
+// ========================================
 // BADGE SIZE
-// -----------------------------
+// ========================================
 
 sizeRange.addEventListener("input", () => {
-
   const size = Number(sizeRange.value);
 
   previewBadge.style.width = `${size}px`;
   previewBadge.style.height = `${size}px`;
-
   previewBadge.style.fontSize = `${Math.round(size * 0.63)}px`;
 });
 
 
-// -----------------------------
+// ========================================
 // BADGE SPACING
-// -----------------------------
+// ========================================
 
 spacingRange.addEventListener("input", () => {
-
   const spacing = Number(spacingRange.value);
 
   previewBadge.style.marginLeft = `${spacing}px`;
 });
 
 
-// -----------------------------
+// ========================================
 // BADGE BUTTON
-// -----------------------------
+// ========================================
 
 badgeButton.addEventListener("click", () => {
 
-  status.textContent = "✓ Badge added to the preview";
+  status.textContent = "✓ Badge added to preview";
 
   setTimeout(() => {
     status.textContent = "";
@@ -63,45 +60,11 @@ badgeButton.addEventListener("click", () => {
 });
 
 
-// -----------------------------
-// COPY NAME
-// -----------------------------
+// ========================================
+// CREATE PNG
+// ========================================
 
-copyButton.addEventListener("click", async () => {
-
-  const name = nameInput.value.trim() || "Harrison";
-
-  /*
-    Clipboard text cannot contain our custom graphic.
-    We therefore copy the name plus a Unicode approximation.
-  */
-
-  const text = `${name} 🔵✓`;
-
-  try {
-
-    await navigator.clipboard.writeText(text);
-
-    status.textContent = "✓ Copied!";
-
-  } catch (error) {
-
-    status.textContent = "Copy failed. Try again.";
-
-  }
-
-  setTimeout(() => {
-    status.textContent = "";
-  }, 2000);
-
-});
-
-
-// -----------------------------
-// DOWNLOAD PNG
-// -----------------------------
-
-downloadButton.addEventListener("click", () => {
+function createBadgeCanvas() {
 
   const name = nameInput.value.trim() || "Harrison";
 
@@ -117,18 +80,21 @@ downloadButton.addEventListener("click", () => {
 
   const textWidth = ctx.measureText(name).width;
 
-  const badgeWidth = badgeSize;
+  const paddingLeft = 15;
+  const paddingRight = 15;
+
   const totalWidth =
+    paddingLeft +
     textWidth +
     spacing +
-    badgeWidth +
-    30;
+    badgeSize +
+    paddingRight;
 
   const totalHeight =
     Math.max(fontSize, badgeSize) + 30;
 
-  canvas.width = totalWidth;
-  canvas.height = totalHeight;
+  canvas.width = Math.ceil(totalWidth);
+  canvas.height = Math.ceil(totalHeight);
 
   // Transparent background
   ctx.clearRect(
@@ -138,24 +104,28 @@ downloadButton.addEventListener("click", () => {
     canvas.height
   );
 
-  // Draw name
+
+  // ========================================
+  // DRAW NAME
+  // ========================================
+
   ctx.font = `700 ${fontSize}px Arial`;
   ctx.fillStyle = "#ffffff";
   ctx.textBaseline = "middle";
 
   ctx.fillText(
     name,
-    15,
+    paddingLeft,
     totalHeight / 2
   );
 
 
-  // -----------------------------
-  // DRAW BLUE VERIFICATION BADGE
-  // -----------------------------
+  // ========================================
+  // BADGE POSITION
+  // ========================================
 
   const centerX =
-    15 +
+    paddingLeft +
     textWidth +
     spacing +
     badgeSize / 2;
@@ -166,9 +136,14 @@ downloadButton.addEventListener("click", () => {
   const radius =
     badgeSize / 2;
 
+
+  // ========================================
+  // DRAW SCALLOPED BADGE
+  // ========================================
+
   ctx.beginPath();
 
-  const points = 24;
+  const points = 32;
 
   for (let i = 0; i < points; i++) {
 
@@ -179,7 +154,7 @@ downloadButton.addEventListener("click", () => {
     const variation =
       i % 2 === 0
         ? radius
-        : radius * 0.88;
+        : radius * 0.87;
 
     const x =
       centerX +
@@ -198,13 +173,39 @@ downloadButton.addEventListener("click", () => {
 
   ctx.closePath();
 
-  ctx.fillStyle = "#1877f2";
+
+  // Blue badge
+  const gradient =
+    ctx.createLinearGradient(
+      centerX - radius,
+      centerY - radius,
+      centerX + radius,
+      centerY + radius
+    );
+
+  gradient.addColorStop(
+    0,
+    "#4db7ff"
+  );
+
+  gradient.addColorStop(
+    0.5,
+    "#2297ed"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#087ee0"
+  );
+
+  ctx.fillStyle = gradient;
+
   ctx.fill();
 
 
-  // -----------------------------
+  // ========================================
   // DRAW WHITE CHECK
-  // -----------------------------
+  // ========================================
 
   ctx.beginPath();
 
@@ -224,21 +225,102 @@ downloadButton.addEventListener("click", () => {
   );
 
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = Math.max(2, badgeSize * 0.14);
+
+  ctx.lineWidth =
+    Math.max(2, badgeSize * 0.14);
+
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
   ctx.stroke();
 
 
-  // -----------------------------
-  // DOWNLOAD
-  // -----------------------------
+  return canvas;
+}
+
+
+// ========================================
+// COPY ACTUAL IMAGE
+// ========================================
+
+copyButton.addEventListener("click", async () => {
+
+  const canvas = createBadgeCanvas();
+
+  canvas.toBlob(async (blob) => {
+
+    if (!blob) {
+      status.textContent =
+        "Could not create badge image.";
+
+      return;
+    }
+
+    try {
+
+      // Modern browsers
+      if (
+        navigator.clipboard &&
+        window.ClipboardItem
+      ) {
+
+        const item =
+          new ClipboardItem({
+            "image/png": blob
+          });
+
+        await navigator.clipboard.write([
+          item
+        ]);
+
+        status.textContent =
+          "✓ Badge image copied!";
+
+      } else {
+
+        // Fallback
+        status.textContent =
+          "Image copying isn't supported here. Use Download PNG.";
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      status.textContent =
+        "Copy failed. Use Download PNG.";
+
+    }
+
+    setTimeout(() => {
+      status.textContent = "";
+    }, 3000);
+
+  }, "image/png");
+
+});
+
+
+// ========================================
+// DOWNLOAD PNG
+// ========================================
+
+downloadButton.addEventListener("click", () => {
+
+  const name =
+    nameInput.value.trim() || "Harrison";
+
+  const canvas =
+    createBadgeCanvas();
 
   canvas.toBlob((blob) => {
 
     if (!blob) {
-      status.textContent = "Could not create image.";
+
+      status.textContent =
+        "Could not create image.";
+
       return;
     }
 
