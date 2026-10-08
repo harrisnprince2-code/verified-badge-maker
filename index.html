@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verified Badge Maker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <h1>Verified Badge Maker</h1>
+    <p class="subtitle">Create a name with a custom verification badge.</p>
+
+    <div class="card">
+
+      <label for="nameInput">Your name</label>
+
+      <input
+        type="text"
+        id="nameInput"
+        placeholder="Enter your name"
+        value="Harrison"
+        autocomplete="off"
+      >
+
+      <label>Badge</label>
+
+      <button id="badgeButton" class="badge-button">
+        <span class="badge">
+          <span class="check">✓</span>
+        </span>
+        Add Verification Badge
+      </button>
+
+      <div class="preview-label">Preview</div>
+
+      <div class="preview" id="preview">
+        <span id="previewName">Harrison</span>
+
+        <span
+          class="badge preview-badge"
+          id="previewBadge"
+          title="Verification badge"
+        >
+          <span class="check">✓</span>
+        </span>
+      </div>
+
+      <div class="controls">
+
+        <div>
+          <label for="sizeRange">Badge size</label>
+          <input
+            type="range"
+            id="sizeRange"
+            min="12"
+            max="40"
+            value="22"
+          >
+        </div>
+
+        <div>
+          <label for="spacingRange">Badge spacing</label>
+          <input
+            type="range"
+            id="spacingRange"
+            min="0"
+            max="15"
+            value="4"
+          >
+        </div>
+
+      </div>
+
+      <div class="buttons">
+
+        <button id="copyButton" class="primary">
+          Copy Name
+        </button>
+
+        <button id="downloadButton">
+          Download PNG
+        </button>
+
+      </div>
+
+      <p id="status"></p>
+
+    </div>
+
+    <p class="note">
+      The badge is a custom graphic for your mockup/prank—not a real platform verification mark.
+    </p>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
