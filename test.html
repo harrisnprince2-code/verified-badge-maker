@@ -1,823 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badge Character Finder</title>
 
-  <title>Character Inspector</title>
+<style>
+* {
+    box-sizing: border-box;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+body {
+    margin: 0;
+    padding: 20px;
+    background: #080b12;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
 
-    body {
-      margin: 0;
-      padding: 25px;
-      background: #07090d;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
+.container {
+    max-width: 850px;
+    margin: auto;
+}
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-    }
+h1 {
+    text-align: center;
+    margin-bottom: 8px;
+}
 
-    h1 {
-      margin-bottom: 8px;
-    }
+.subtitle {
+    text-align: center;
+    color: #aeb8ca;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
 
-    .subtitle {
-      color: #9aa3af;
-      line-height: 1.5;
-    }
+.notice {
+    padding: 14px;
+    background: #151d30;
+    border: 1px solid #293b5d;
+    border-radius: 12px;
+    color: #d6e3ff;
+    line-height: 1.6;
+    margin-bottom: 22px;
+}
 
-    .card {
-      margin-top: 25px;
-      padding: 25px;
-      background: #11151c;
-      border: 1px solid #29313d;
-      border-radius: 16px;
-    }
+h2 {
+    margin-top: 30px;
+    font-size: 19px;
+}
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 12px;
+}
 
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      resize: vertical;
+.card {
+    background: #111725;
+    border: 1px solid #263248;
+    border-radius: 14px;
+    padding: 15px 8px;
+    text-align: center;
+}
 
-      padding: 18px;
+.symbol {
+    min-height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    overflow-wrap: anywhere;
+}
 
-      background: #080a0e;
-      color: white;
+.combo {
+    font-size: 29px;
+}
 
-      border: 1px solid #343c48;
-      border-radius: 12px;
+.code {
+    color: #9caac0;
+    font-size: 11px;
+    margin: 8px 0 12px;
+}
 
-      outline: none;
+button {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 5px;
+    background: #1877f2;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-      font-size: 22px;
-      line-height: 1.5;
-    }
+button:active {
+    transform: scale(0.97);
+}
 
-    textarea:focus {
-      border-color: #249cff;
-    }
+#status {
+    position: sticky;
+    bottom: 10px;
+    margin-top: 22px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #1c293e;
+    text-align: center;
+    color: #ffffff;
+}
 
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 9px;
-
-      padding: 11px 16px;
-
-      background: #1877f2;
-      color: white;
-
-      font-size: 14px;
-      font-weight: bold;
-
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0d65d9;
-    }
-
-    button.secondary {
-      background: #252b34;
-    }
-
-    button.secondary:hover {
-      background: #303844;
-    }
-
-    .result {
-      margin-top: 22px;
-      display: none;
-    }
-
-    .result.show {
-      display: block;
-    }
-
-    .result-box {
-      background: #080a0e;
-      border: 1px solid #29313d;
-      border-radius: 12px;
-      padding: 18px;
-      margin-top: 10px;
-    }
-
-    .character {
-      font-size: 55px;
-      min-height: 70px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-bottom: 1px solid #252b34;
-      margin-bottom: 15px;
-    }
-
-    .info {
-      display: grid;
-      gap: 10px;
-    }
-
-    .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-
-      padding: 10px 0;
-
-      border-bottom: 1px solid #1d232c;
-    }
-
-    .row:last-child {
-      border-bottom: 0;
-    }
-
-    .key {
-      color: #9aa3af;
-    }
-
-    .value {
-      font-family: Consolas, monospace;
-      text-align: right;
-      word-break: break-all;
-    }
-
-    .warning {
-      margin-top: 18px;
-      padding: 14px;
-
-      background: #19150c;
-      border: 1px solid #4a3b19;
-      border-radius: 10px;
-
-      color: #d8c48a;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-
-    .success {
-      margin-top: 18px;
-      padding: 14px;
-
-      background: #0c1912;
-      border: 1px solid #1e5735;
-      border-radius: 10px;
-
-      color: #7ee2a5;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-
-    .history {
-      margin-top: 30px;
-    }
-
-    .history-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-
-      padding: 12px;
-
-      background: #0b0e13;
-      border: 1px solid #252c35;
-      border-radius: 10px;
-
-      margin-top: 8px;
-    }
-
-    .history-character {
-      width: 45px;
-      font-size: 28px;
-      text-align: center;
-    }
-
-    .history-code {
-      font-family: Consolas, monospace;
-      color: #aeb7c4;
-    }
-
-    .empty {
-      color: #737d8a;
-      font-size: 13px;
-    }
-
-    @media (max-width: 600px) {
-
-      body {
-        padding: 15px;
-      }
-
-      .card {
-        padding: 18px;
-      }
-
-      .row {
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .value {
-        text-align: left;
-      }
-
-    }
-  </style>
+.footer {
+    margin-top: 25px;
+    color: #9caac0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+</style>
 </head>
 
 <body>
+<div class="container">
+
+<h1>Badge Character Finder</h1>
+
+<p class="subtitle">
+Explore starburst symbols, decorative characters and checkmark combinations.
+</p>
+
+<div class="notice">
+<strong>Our target:</strong> a sharp, zigzag-edged badge with a blue appearance
+and a checkmark in the middle. Test these characters to find the closest match.
+</div>
+
+<div id="catalog"></div>
+
+<div id="status" role="status">Choose a symbol and tap COPY.</div>
+
+<p class="footer">
+Note: Unicode characters may look different on different devices and apps.
+These are text candidates, not actual Facebook verification badges.
+</p>
+
+</div>
+
+<script>
+const groups = [
+{
+    title: "1. Starburst and Zigzag Shapes",
+    items: [
+        ["✪", "U+272A"],
+        ["✴", "U+2734"],
+        ["✵", "U+2735"],
+        ["✷", "U+2737"],
+        ["✸", "U+2738"],
+        ["✹", "U+2739"],
+        ["✺", "U+273A"],
+        ["✻", "U+273B"],
+        ["✼", "U+273C"],
+        ["❂", "U+2742"],
+        ["✮", "U+272E"],
+        ["✯", "U+272F"],
+        ["✰", "U+2730"],
+        ["✳", "U+2733"],
+        ["✦", "U+2726"],
+        ["❋", "U+274B"]
+    ]
+},
+{
+    title: "2. Badge and Shield Symbols",
+    items: [
+        ["🛡️", "Shield emoji"],
+        ["🔰", "Beginner symbol"],
+        ["🪪", "ID card emoji"],
+        ["🔵", "Blue circle"],
+        ["🔷", "Blue diamond"],
+        ["🔹", "Small blue diamond"],
+        ["💠", "Diamond shape"],
+        ["🔯", "Six-pointed star"],
+        ["✪", "Circled star"],
+        ["❖", "Diamond ornament"],
+        ["⬟", "Pentagon"],
+        ["⬢", "Hexagon"]
+    ]
+},
+{
+    title: "3. Checkmark Characters",
+    items: [
+        ["✓", "U+2713"],
+        ["✔", "U+2714"],
+        ["🗸", "U+1F5F8"],
+        ["🗹", "U+1F5F9"],
+        ["☑", "U+2611"],
+        ["✅", "U+2705"],
+        ["☒", "U+2612"],
+        ["√", "U+221A"]
+    ]
+},
+{
+    title: "4. Combined Badge Candidates",
+    items: [
+        ["✪✓", "Star + check"],
+        ["✪✔", "Star + heavy check"],
+        ["✴✓", "Starburst + check"],
+        ["✴✔", "Starburst + heavy check"],
+        ["✸✓", "Sharp star + check"],
+        ["✸✔", "Sharp star + heavy check"],
+        ["🔵✔", "Blue circle + check"],
+        ["🔷✔", "Blue diamond + check"],
+        ["🔰✓", "Badge symbol + check"],
+        ["🛡️✓", "Shield + check"],
+        ["❂✓", "Circled star + check"],
+        ["✺✔", "Starburst + heavy check"]
+    ]
+}
+];
+
+const catalog = document.getElementById("catalog");
+
+groups.forEach(group => {
+    const heading = document.createElement("h2");
+    heading.textContent = group.title;
+    catalog.appendChild(heading);
 
-  <div class="container">
+    const grid = document.createElement("div");
+    grid.className = "grid";
 
-    <h1>Character Inspector</h1>
+    group.items.forEach(([symbol, code]) => {
+        const card = document.createElement("div");
+        card.className = "card";
 
-    <p class="subtitle">
-      Paste the mystery character here. This tool will inspect the
-      actual Unicode character instead of trying to identify it from
-      a screenshot.
-    </p>
+        const preview = document.createElement("div");
+        preview.className = "symbol";
 
-
-    <!-- =========================================
-         INSPECTOR
-    ========================================== -->
-
-    <div class="card">
-
-      <label for="characterInput">
-        Paste the mystery character
-      </label>
-
-      <textarea
-        id="characterInput"
-        placeholder="Paste the character here..."
-        autocomplete="off"
-        spellcheck="false"
-      ></textarea>
-
-
-      <div class="buttons">
-
-        <button id="inspectButton">
-          Inspect Character
-        </button>
-
-        <button
-          id="pasteButton"
-          class="secondary"
-        >
-          Paste From Clipboard
-        </button>
-
-        <button
-          id="clearButton"
-          class="secondary"
-        >
-          Clear
-        </button>
-
-      </div>
-
-
-      <!-- =========================================
-           RESULT
-      ========================================== -->
-
-      <div
-        id="result"
-        class="result"
-      >
-
-        <div class="result-box">
-
-          <div
-            id="characterPreview"
-            class="character"
-          ></div>
-
-
-          <div class="info">
-
-            <div class="row">
-              <span class="key">
-                Character
-              </span>
-
-              <span
-                id="characterValue"
-                class="value"
-              ></span>
-            </div>
-
-
-            <div class="row">
-              <span class="key">
-                Unicode Code Point
-              </span>
-
-              <span
-                id="unicodeValue"
-                class="value"
-              ></span>
-            </div>
-
-
-            <div class="row">
-              <span class="key">
-                Decimal
-              </span>
-
-              <span
-                id="decimalValue"
-                class="value"
-              ></span>
-            </div>
-
-
-            <div class="row">
-              <span class="key">
-                UTF-16
-              </span>
-
-              <span
-                id="utf16Value"
-                class="value"
-              ></span>
-            </div>
-
-
-            <div class="row">
-              <span class="key">
-                Code Point Type
-              </span>
-
-              <span
-                id="typeValue"
-                class="value"
-              ></span>
-            </div>
-
-          </div>
-
-
-          <div
-            id="message"
-          ></div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- =========================================
-         TEST HISTORY
-    ========================================== -->
-
-    <div class="card history">
-
-      <h2>Test History</h2>
-
-      <p class="subtitle">
-        Characters you inspect will appear here.
-      </p>
-
-      <div id="historyList">
-
-        <div class="empty">
-          No characters tested yet.
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <script>
-
-    const input =
-      document.getElementById("characterInput");
-
-    const inspectButton =
-      document.getElementById("inspectButton");
-
-    const pasteButton =
-      document.getElementById("pasteButton");
-
-    const clearButton =
-      document.getElementById("clearButton");
-
-    const result =
-      document.getElementById("result");
-
-    const characterPreview =
-      document.getElementById("characterPreview");
-
-    const characterValue =
-      document.getElementById("characterValue");
-
-    const unicodeValue =
-      document.getElementById("unicodeValue");
-
-    const decimalValue =
-      document.getElementById("decimalValue");
-
-    const utf16Value =
-      document.getElementById("utf16Value");
-
-    const typeValue =
-      document.getElementById("typeValue");
-
-    const message =
-      document.getElementById("message");
-
-    const historyList =
-      document.getElementById("historyList");
-
-
-    // =========================================
-    // GET CHARACTER TYPE
-    // =========================================
-
-    function getCharacterType(codePoint) {
-
-      if (
-        codePoint >= 0xE000 &&
-        codePoint <= 0xF8FF
-      ) {
-        return "Private Use Area";
-      }
-
-      if (
-        codePoint >= 0xF0000 &&
-        codePoint <= 0xFFFFD
-      ) {
-        return "Supplementary Private Use Area-A";
-      }
-
-      if (
-        codePoint >= 0x100000 &&
-        codePoint <= 0x10FFFD
-      ) {
-        return "Supplementary Private Use Area-B";
-      }
-
-      if (
-        codePoint >= 0xD800 &&
-        codePoint <= 0xDFFF
-      ) {
-        return "UTF-16 surrogate";
-      }
-
-      return "Standard Unicode character";
-    }
-
-
-    // =========================================
-    // FORMAT UNICODE
-    // =========================================
-
-    function formatUnicode(codePoint) {
-
-      return "U+" +
-        codePoint
-          .toString(16)
-          .toUpperCase()
-          .padStart(4, "0");
-
-    }
-
-
-    // =========================================
-    // GET UTF-16
-    // =========================================
-
-    function getUTF16(character) {
-
-      const units = [];
-
-      for (
-        let i = 0;
-        i < character.length;
-        i++
-      ) {
-
-        units.push(
-          character
-            .charCodeAt(i)
-            .toString(16)
-            .toUpperCase()
-            .padStart(4, "0")
-        );
-
-      }
-
-      return units.join(" ");
-    }
-
-
-    // =========================================
-    // INSPECT
-    // =========================================
-
-    function inspectCharacter() {
-
-      const text =
-        input.value;
-
-      if (!text) {
-
-        result.classList.remove("show");
-
-        return;
-
-      }
-
-
-      // Get first Unicode code point
-      const character =
-        Array.from(text)[0];
-
-      const codePoint =
-        character.codePointAt(0);
-
-
-      // Display character
-      characterPreview.textContent =
-        character;
-
-
-      characterValue.textContent =
-        character;
-
-
-      unicodeValue.textContent =
-        formatUnicode(codePoint);
-
-
-      decimalValue.textContent =
-        codePoint.toString();
-
-
-      utf16Value.textContent =
-        getUTF16(character);
-
-
-      typeValue.textContent =
-        getCharacterType(codePoint);
-
-
-      // =========================================
-      // MESSAGE
-      // =========================================
-
-      if (
-        codePoint >= 0xE000 &&
-        codePoint <= 0xF8FF
-      ) {
-
-        message.className =
-          "warning";
-
-        message.textContent =
-          "This is a Private Use Area character. " +
-          "That is interesting because its appearance " +
-          "can be defined by a specific app or font. " +
-          "The code point alone does not guarantee that " +
-          "another app will render the same symbol.";
-
-      } else {
-
-        message.className =
-          "success";
-
-        message.textContent =
-          "This appears to be a standard Unicode character. " +
-          "We can now identify exactly what character it is.";
-
-      }
-
-
-      result.classList.add("show");
-
-
-      // =========================================
-      // HISTORY
-      // =========================================
-
-      addHistory(
-        character,
-        codePoint
-      );
-
-    }
-
-
-    // =========================================
-    // ADD HISTORY
-    // =========================================
-
-    function addHistory(
-      character,
-      codePoint
-    ) {
-
-      const empty =
-        historyList.querySelector(".empty");
-
-      if (empty) {
-        empty.remove();
-      }
-
-
-      const item =
-        document.createElement("div");
-
-      item.className =
-        "history-item";
-
-
-      const char =
-        document.createElement("div");
-
-      char.className =
-        "history-character";
-
-      char.textContent =
-        character;
-
-
-      const code =
-        document.createElement("div");
-
-      code.className =
-        "history-code";
-
-      code.textContent =
-        formatUnicode(codePoint);
-
-
-      const copy =
-        document.createElement("button");
-
-      copy.textContent =
-        "Copy";
-
-      copy.addEventListener(
-        "click",
-        async () => {
-
-          try {
-
-            await navigator.clipboard.writeText(
-              character
-            );
-
-            copy.textContent =
-              "Copied ✓";
-
-            setTimeout(() => {
-
-              copy.textContent =
-                "Copy";
-
-            }, 1200);
-
-          } catch {
-
-            copy.textContent =
-              "Failed";
-
-          }
-
-        }
-      );
-
-
-      item.appendChild(char);
-      item.appendChild(code);
-      item.appendChild(copy);
-
-      historyList.prepend(item);
-
-    }
-
-
-    // =========================================
-    // INSPECT BUTTON
-    // =========================================
-
-    inspectButton.addEventListener(
-      "click",
-      inspectCharacter
-    );
-
-
-    // =========================================
-    // PASTE FROM CLIPBOARD
-    // =========================================
-
-    pasteButton.addEventListener(
-      "click",
-      async () => {
-
-        try {
-
-          const text =
-            await navigator.clipboard.readText();
-
-          if (!text) {
-
-            input.value = "";
-
-            alert(
-              "Your clipboard appears to be empty."
-            );
-
-            return;
-
-          }
-
-          input.value =
-            text;
-
-          inspectCharacter();
-
-        } catch (error) {
-
-          alert(
-            "The browser did not allow clipboard access. " +
-            "Click inside the box and press Ctrl + V instead."
-          );
-
+        if (symbol.length > 1) {
+            preview.classList.add("combo");
         }
 
-      }
-    );
+        preview.textContent = symbol;
 
+        const codeLabel = document.createElement("div");
+        codeLabel.className = "code";
+        codeLabel.textContent = code;
 
-    // =========================================
-    // CLEAR
-    // =========================================
+        const button = document.createElement("button");
+        button.textContent = "COPY";
 
-    clearButton.addEventListener(
-      "click",
-      () => {
+        button.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(symbol);
+                document.getElementById("status").textContent =
+                    "Copied: " + symbol + " — ready to paste!";
+            } catch (error) {
+                const field = document.createElement("textarea");
+                field.value = symbol;
+                field.style.position = "fixed";
+                field.style.opacity = "0";
+                document.body.appendChild(field);
+                field.select();
 
-        input.value = "";
+                const success = document.execCommand("copy");
+                field.remove();
 
-        result.classList.remove(
-          "show"
-        );
+                document.getElementById("status").textContent =
+                    success
+                    ? "Copied: " + symbol
+                    : "Copy failed. Select the symbol manually.";
+            }
+        });
 
-      }
-    );
+        card.appendChild(preview);
+        card.appendChild(codeLabel);
+        card.appendChild(button);
+        grid.appendChild(card);
+    });
 
-
-    // =========================================
-    // CTRL + ENTER
-    // =========================================
-
-    input.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (
-          event.ctrlKey &&
-          event.key === "Enter"
-        ) {
-
-          inspectCharacter();
-
-        }
-
-      }
-    );
-
-  </script>
+    catalog.appendChild(grid);
+});
+</script>
 
 </body>
 </html>
